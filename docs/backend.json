@@ -1,0 +1,111 @@
+
+{
+  "entities": {
+    "AppUser": {
+      "title": "AppUser",
+      "description": "Perfil de usuário do sistema de estacionamento.",
+      "type": "object",
+      "properties": {
+        "nome": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "tipoUsuario": { "type": "string", "enum": ["Admin", "Operador"] },
+        "ativo": { "type": "boolean" },
+        "telefone": { "type": "string" },
+        "criadoEm": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nome", "email", "tipoUsuario", "ativo"]
+    },
+    "Exemption": {
+      "title": "Exemption",
+      "description": "Cadastro de veículos isentos com detalhes de benefício.",
+      "type": "object",
+      "properties": {
+        "nome": { "type": "string" },
+        "funcao": { "type": "string" },
+        "empresa": { "type": "string" },
+        "placa": { "type": "string" },
+        "telefone": { "type": "string" },
+        "tipoBeneficio": { "type": "string" },
+        "ativo": { "type": "boolean" },
+        "criadoEm": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nome", "placa", "ativo", "empresa", "funcao"]
+    },
+    "Mensalista": {
+      "title": "Mensalista",
+      "description": "Cadastro de clientes mensalistas.",
+      "type": "object",
+      "properties": {
+        "nome": { "type": "string" },
+        "placa": { "type": "string" },
+        "telefone": { "type": "string" },
+        "dataInicio": { "type": "string", "format": "date" },
+        "dataVencimento": { "type": "string", "format": "date" },
+        "ativo": { "type": "boolean" },
+        "valorMensal": { "type": "number" }
+      },
+      "required": ["nome", "placa", "dataVencimento", "ativo"]
+    },
+    "Movimentacao": {
+      "title": "Movimentacao",
+      "description": "Registro de entrada e saída de veículos.",
+      "type": "object",
+      "properties": {
+        "placa": { "type": "string" },
+        "tipoVeiculo": { "type": "string", "enum": ["Carro", "Moto"] },
+        "modelo": { "type": "string" },
+        "cor": { "type": "string" },
+        "destino": { "type": "string" },
+        "classificacao": { "type": "string", "enum": ["Rotativo", "Avulso", "Mensalista", "Isento"] },
+        "entradaEm": { "type": "string", "format": "date-time" },
+        "saidaEm": { "type": "string", "format": "date-time" },
+        "operadorUid": { "type": "string" },
+        "status": { "type": "string", "enum": ["Ativo", "Finalizado"] },
+        "valor": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "isento": { "type": "boolean" },
+        "beneficiarioNome": { "type": "string" }
+      },
+      "required": ["placa", "classificacao", "status", "entradaEm"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Configurações globais e operacionais do pátio.",
+      "type": "object",
+      "properties": {
+        "totalCarrosBase": { "type": "number" },
+        "totalMotosBase": { "type": "number" },
+        "totalCarrosHoje": { "type": "number" },
+        "totalMotosHoje": { "type": "number" },
+        "atualizadoPor": { "type": "string" },
+        "atualizadoEm": { "type": "string", "format": "date-time" },
+        "observacao": { "type": "string" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/usuarios/{userId}": {
+      "schema": "#/backend/entities/AppUser",
+      "description": "Dados de perfil de usuários."
+    },
+    "/isencoes/{exemptionId}": {
+      "schema": "#/backend/entities/Exemption",
+      "description": "Base de dados de isenções detalhadas."
+    },
+    "/mensalistas/{mensalistaId}": {
+      "schema": "#/backend/entities/Mensalista",
+      "description": "Base de dados de mensalistas."
+    },
+    "/movimentacoes/{movId}": {
+      "schema": "#/backend/entities/Movimentacao",
+      "description": "Registros de movimentação operacional."
+    },
+    "/configuracoes/vagas": {
+      "schema": "#/backend/entities/Settings",
+      "description": "Configuração de capacidade dinâmica do pátio."
+    }
+  }
+}
