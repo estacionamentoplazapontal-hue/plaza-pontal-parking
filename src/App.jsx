@@ -18,19 +18,21 @@ function App() {
     useState([]);
 
   async function carregarMovimentacoes() {
-    const { data } =
-      await supabase
-        .from("movimentacoes")
-        .select("*")
-        .order(
-          "entrada_em",
-          { ascending: false }
-        );
+  const {
+  data,
+  error,
+} = await supabase
+  .from("movimentacoes")
+  .select("*")
+  .order(
+    "entrada_em",
+    { ascending: false }
+  );
 
-    if (data) {
-      setMovimentacoes(data);
-    }
-  }
+if (error) {
+  console.log(error);
+  return;
+}
 
   useEffect(() => {
     carregarMovimentacoes();
@@ -41,21 +43,21 @@ function App() {
 
     if (!placa) return;
 
-    await supabase
-      .from("movimentacoes")
-      .insert([
-        {
-          placa,
-          modelo,
-          status: "ativo",
-        },
-      ]);
+ const { error } =
+  await supabase
+    .from("movimentacoes")
+    .insert([
+      {
+        placa,
+        modelo,
+        status: "ativo",
+      },
+    ]);
 
-    setPlaca("");
-    setModelo("");
-
-    carregarMovimentacoes();
-  }
+if (error) {
+  alert(error.message);
+  return;
+}
 
   async function registrarSaida(id) {
     await supabase
