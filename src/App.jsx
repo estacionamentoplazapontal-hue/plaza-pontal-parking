@@ -239,7 +239,10 @@ Entrada:
 {" "}
 {new Date(
   item.entrada_em
-).toLocaleString()}
+).toLocaleString("pt-BR", {
+  timeZone:
+    "America/Sao_Paulo",
+})}
 
 <br />
 
@@ -252,7 +255,10 @@ Entrada:
     {" "}
     {new Date(
       item.saida_em
-    ).toLocaleString()}
+    ).toLocaleString("pt-BR", {
+  timeZone:
+    "America/Sao_Paulo",
+})}
 
     <br />
 
