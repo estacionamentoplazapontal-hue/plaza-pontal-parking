@@ -243,8 +243,11 @@ Entrada:
 
 <br />
 
-{item.saida_em && (
+{item.status ===
+  "finalizado" && (
   <>
+    <br />
+
     Saída:
     {" "}
     {new Date(
@@ -253,17 +256,36 @@ Entrada:
 
     <br />
 
+    Permanência:
+    {" "}
+    {Math.ceil(
+      (new Date(
+        item.saida_em
+      ) -
+        new Date(
+          item.entrada_em
+        )) /
+        1000 /
+        60 /
+        60
+    )}
+    h
+
+    <br />
+
     Valor:
     {" "}
     R$
     {" "}
-    {item.valor}
+    {Number(
+      item.valor || 0
+    ).toFixed(2)}
   </>
 )}
               </div>
 
               {item.status ===
-                "ativo" && (
+  "ativo" ? (
                 <button
                   onClick={() =>
                     registrarSaida(item)
@@ -271,7 +293,18 @@ Entrada:
                 >
                   Saída
                 </button>
-              )}
+              )
+:
+(
+  <span
+    style={{
+      color: "green",
+      fontWeight: "bold",
+    }}
+  >
+    Finalizado
+  </span>
+)}
             </div>
           )
         )}
