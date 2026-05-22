@@ -81,26 +81,42 @@ function App() {
   const saida =
     new Date();
 
-  const horas =
+  const diffMs =
+    saida.getTime() -
+    entrada.getTime();
+
+  const minutos =
     Math.ceil(
-      (saida - entrada) /
-        1000 /
-        60 /
-        60
+      diffMs / 1000 / 60
+    );
+
+  const horas =
+    Math.max(
+      1,
+      Math.ceil(
+        minutos / 60
+      )
     );
 
   const valor =
     horas * 15;
 
-  await supabase
-    .from("movimentacoes")
-    .update({
-      status:
-        "finalizado",
-      saida_em: saida,
-      valor,
-    })
-    .eq("id", item.id);
+  const { error } =
+    await supabase
+      .from("movimentacoes")
+      .update({
+        status:
+          "finalizado",
+        saida_em:
+          saida.toISOString(),
+        valor,
+      })
+      .eq("id", item.id);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
   carregarMovimentacoes();
 }
@@ -239,10 +255,9 @@ Entrada:
 {" "}
 {new Date(
   item.entrada_em
-).toLocaleString("pt-BR", {
-  timeZone:
-    "America/Sao_Paulo",
-})}
+).toLocaleString(
+  "pt-BR"
+)}
 
 <br />
 
@@ -255,27 +270,29 @@ Entrada:
     {" "}
     {new Date(
       item.saida_em
-    ).toLocaleString("pt-BR", {
-  timeZone:
-    "America/Sao_Paulo",
-})}
+    ).toLocaleString(
+  "pt-BR"
+)}
 
     <br />
 
-    Permanência:
-    {" "}
-    {Math.ceil(
-      (new Date(
-        item.saida_em
-      ) -
-        new Date(
-          item.entrada_em
-        )) /
-        1000 /
-        60 /
-        60
-    )}
-    h
+   Permanência:
+{" "}
+{Math.max(
+  1,
+  Math.ceil(
+    (new Date(
+      item.saida_em
+    ).getTime() -
+      new Date(
+        item.entrada_em
+      ).getTime()) /
+      1000 /
+      60 /
+      60
+  )
+)}
+h
 
     <br />
 
