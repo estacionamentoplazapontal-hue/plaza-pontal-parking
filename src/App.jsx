@@ -3,10 +3,8 @@ import { useAuth } from "./context/AuthContext";
 import { supabase } from "./lib/supabase";
 
 function App() {
-  const {
-    user,
-    signOut,
-  } = useAuth();
+  const { user, signOut } =
+    useAuth();
 
   const [placa, setPlaca] =
     useState("");
@@ -14,56 +12,72 @@ function App() {
   const [modelo, setModelo] =
     useState("");
 
-  const [movimentacoes, setMovimentacoes] =
-    useState([]);
+  const [
+    movimentacoes,
+    setMovimentacoes,
+  ] = useState([]);
 
   async function carregarMovimentacoes() {
-  const {
-  data,
-  error,
-} = await supabase
-  .from("movimentacoes")
-  .select("*")
-  .order(
-    "entrada_em",
-    { ascending: false }
-  );
+    const {
+      data,
+      error,
+    } = await supabase
+      .from("movimentacoes")
+      .select("*")
+      .order(
+        "entrada_em",
+        {
+          ascending: false,
+        }
+      );
 
-if (error) {
-  console.log(error);
-  return;
-}
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    setMovimentacoes(data);
+  }
 
   useEffect(() => {
     carregarMovimentacoes();
   }, []);
 
-  async function registrarEntrada(e) {
+  async function registrarEntrada(
+    e
+  ) {
     e.preventDefault();
 
-    if (!placa) return;
+    const { error } =
+      await supabase
+        .from("movimentacoes")
+        .insert([
+          {
+            placa,
+            modelo,
+            status: "ativo",
+          },
+        ]);
 
- const { error } =
-  await supabase
-    .from("movimentacoes")
-    .insert([
-      {
-        placa,
-        modelo,
-        status: "ativo",
-      },
-    ]);
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
-if (error) {
-  alert(error.message);
-  return;
-}
+    setPlaca("");
+    setModelo("");
 
-  async function registrarSaida(id) {
+    carregarMovimentacoes();
+  }
+
+  async function registrarSaida(
+    id
+  ) {
     await supabase
       .from("movimentacoes")
       .update({
-        status: "finalizado",
+        status:
+          "finalizado",
         saida_em:
           new Date(),
       })
@@ -76,9 +90,11 @@ if (error) {
     <div
       style={{
         minHeight: "100vh",
-        background: "#f5f5f5",
+        background:
+          "#f5f5f5",
         padding: 20,
-        fontFamily: "Arial",
+        fontFamily:
+          "Arial",
       }}
     >
       <div
@@ -86,12 +102,14 @@ if (error) {
           display: "flex",
           justifyContent:
             "space-between",
-          alignItems: "center",
+          alignItems:
+            "center",
         }}
       >
         <div>
           <h1>
-            Plaza Pontal Parking
+            Plaza Pontal
+            Parking
           </h1>
 
           <p>
@@ -113,7 +131,8 @@ if (error) {
           registrarEntrada
         }
         style={{
-          background: "#fff",
+          background:
+            "#fff",
           padding: 20,
           borderRadius: 10,
           marginTop: 20,
@@ -157,13 +176,14 @@ if (error) {
       <div
         style={{
           marginTop: 20,
-          background: "#fff",
+          background:
+            "#fff",
           borderRadius: 10,
           padding: 20,
         }}
       >
         <h2>
-          Veículos no pátio
+          Veículos
         </h2>
 
         {movimentacoes.map(
