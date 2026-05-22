@@ -10,10 +10,11 @@ function formatarData(data) {
 
 function App() {
   const {
-    user,
-    signIn,
-    signOut,
-  } = useAuth();
+  user,
+  perfil,
+  signIn,
+  signOut,
+} = useAuth();
 
   const [email, setEmail] =
     useState("");
@@ -271,11 +272,13 @@ function App() {
             Parking
           </h1>
 
-          <p>
-            Usuário:
-            {" "}
-            {user?.email}
-          </p>
+         <p>
+  {perfil?.nome}
+</p>
+
+<p>
+  {perfil?.tipo}
+</p>
         </div>
 
         <button
@@ -283,6 +286,14 @@ function App() {
         >
           Sair
         </button>
+{
+  perfil?.tipo ===
+    "admin" && (
+    <button>
+      Criar Operador
+    </button>
+  )
+}
       </div>
 
       <div

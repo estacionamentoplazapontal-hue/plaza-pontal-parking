@@ -16,33 +16,68 @@ export function AuthProvider({
   const [user, setUser] =
     useState(null);
 
+  const [perfil, setPerfil] =
+    useState(null);
+
   const [loading, setLoading] =
     useState(true);
 
+  async function carregarPerfil(
+    userId
+  ) {
+    const { data } =
+      await supabase
+        .from("usuarios")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+    setPerfil(data);
+  }
+
   useEffect(() => {
-    async function carregarUsuario() {
+    async function init() {
       const {
         data: { session },
       } =
         await supabase.auth.getSession();
 
-      setUser(
-        session?.user || null
-      );
+      const usuario =
+        session?.user || null;
+
+      setUser(usuario);
+
+      if (usuario) {
+        await carregarPerfil(
+          usuario.id
+        );
+      }
 
       setLoading(false);
     }
 
-    carregarUsuario();
+    init();
 
     const {
       data: listener,
     } =
       supabase.auth.onAuthStateChange(
-        (_event, session) => {
-          setUser(
-            session?.user || null
-          );
+        async (
+          _event,
+          session
+        ) => {
+          const usuario =
+            session?.user || null;
+
+          setUser(usuario);
+
+          if (usuario) {
+            await carregarPerfil(
+              usuario.id
+            );
+          } else {
+            setPerfil(null);
+          }
         }
       );
 
@@ -67,14 +102,14 @@ export function AuthProvider({
     await supabase.auth.signOut();
 
     setUser(null);
-
-    window.location.reload();
+    setPerfil(null);
   }
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        perfil,
         loading,
         signIn,
         signOut,
