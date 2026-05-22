@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import { supabase } from "./lib/supabase";
+
 function formatarData(data) {
   return new Date(data).toLocaleString(
     "pt-BR",
@@ -10,6 +11,7 @@ function formatarData(data) {
     }
   );
 }
+
 function App() {
   const { user, signOut } =
     useAuth();
@@ -79,55 +81,55 @@ function App() {
   }
 
   async function registrarSaida(
-  item
-) {
-  const entrada =
-    formatarData(
-  item.entrada_em
-));
+    item
+  ) {
+    const entrada =
+      new Date(
+        item.entrada_em
+      );
 
-  const saida =
-    new Date();
+    const saida =
+      new Date();
 
-  const diffMs =
-    saida.getTime() -
-    entrada.getTime();
+    const diffMs =
+      saida.getTime() -
+      entrada.getTime();
 
-  const minutos =
-    Math.ceil(
-      diffMs / 1000 / 60
-    );
-
-  const horas =
-    Math.max(
-      1,
+    const minutos =
       Math.ceil(
-        minutos / 60
-      )
-    );
+        diffMs / 1000 / 60
+      );
 
-  const valor =
-    horas * 15;
+    const horas =
+      Math.max(
+        1,
+        Math.ceil(
+          minutos / 60
+        )
+      );
 
-  const { error } =
-    await supabase
-      .from("movimentacoes")
-      .update({
-        status:
-          "finalizado",
-        saida_em:
-          saida.toISOString(),
-        valor,
-      })
-      .eq("id", item.id);
+    const valor =
+      horas * 15;
 
-  if (error) {
-    alert(error.message);
-    return;
+    const { error } =
+      await supabase
+        .from("movimentacoes")
+        .update({
+          status:
+            "finalizado",
+          saida_em:
+            saida.toISOString(),
+          valor,
+        })
+        .eq("id", item.id);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    carregarMovimentacoes();
   }
-
-  carregarMovimentacoes();
-}
 
   return (
     <div
@@ -254,89 +256,84 @@ function App() {
                 <br />
 
                 Status:
-{" "}
-{item.status}
+                {" "}
+                {item.status}
 
-<br />
+                <br />
 
-Entrada:
-{" "}
-{new Date(
-  item.entrada_em
-).toLocaleString(
-  "pt-BR"
-)}
+                Entrada:
+                {" "}
+                {formatarData(
+                  item.entrada_em
+                )}
 
-<br />
+                {item.status ===
+                  "finalizado" && (
+                  <>
+                    <br />
 
-{item.status ===
-  "finalizado" && (
-  <>
-    <br />
+                    Saída:
+                    {" "}
+                    {formatarData(
+                      item.saida_em
+                    )}
 
-    Saída:
-    {" "}
-    {new Date(
-      formatarData(
-  item.saida_em
-).toLocaleString(
-  "pt-BR"
-)}
+                    <br />
 
-    <br />
+                    Permanência:
+                    {" "}
+                    {Math.max(
+                      1,
+                      Math.ceil(
+                        (new Date(
+                          item.saida_em
+                        ).getTime() -
+                          new Date(
+                            item.entrada_em
+                          ).getTime()) /
+                          1000 /
+                          60 /
+                          60
+                      )
+                    )}
+                    h
 
-   Permanência:
-{" "}
-{Math.max(
-  1,
-  Math.ceil(
-    (new Date(
-      item.saida_em
-    ).getTime() -
-      new Date(
-        item.entrada_em
-      ).getTime()) /
-      1000 /
-      60 /
-      60
-  )
-)}
-h
+                    <br />
 
-    <br />
-
-    Valor:
-    {" "}
-    R$
-    {" "}
-    {Number(
-      item.valor || 0
-    ).toFixed(2)}
-  </>
-)}
+                    Valor:
+                    {" "}
+                    R$
+                    {" "}
+                    {Number(
+                      item.valor || 0
+                    ).toFixed(2)}
+                  </>
+                )}
               </div>
 
               {item.status ===
-  "ativo" ? (
+              "ativo" ? (
                 <button
                   onClick={() =>
-                    registrarSaida(item)
+                    registrarSaida(
+                      item
+                    )
                   }
                 >
                   Saída
                 </button>
-              )
-:
-(
-  <span
-    style={{
-      color: "green",
-      fontWeight: "bold",
-    }}
-  >
-    Finalizado
-  </span>
-)}
+              ) : (
+                <span
+                  style={{
+                    color:
+                      "green",
+                    fontWeight:
+                      "bold",
+                  }}
+                >
+                  Finalizado
+                </span>
+              )}
             </div>
           )
         )}
