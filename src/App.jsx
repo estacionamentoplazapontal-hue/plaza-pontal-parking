@@ -134,16 +134,6 @@ function App() {
         m.status === "ativo"
     );
 
-  const arrecadado =
-    movimentacoes.reduce(
-      (total, item) =>
-        total +
-        Number(
-          item.valor || 0
-        ),
-      0
-    );
-
   const filtrados =
     movimentacoes.filter(
       (item) =>
@@ -196,50 +186,20 @@ function App() {
 
       <div
         style={{
-          display: "flex",
-          gap: 20,
           marginTop: 20,
+          background:
+            "#fff",
+          padding: 20,
+          borderRadius: 10,
         }}
       >
-        <div
-          style={{
-            background:
-              "#fff",
-            padding: 20,
-            borderRadius: 10,
-            flex: 1,
-          }}
-        >
-          <h3>
-            Veículos Ativos
-          </h3>
+        <h3>
+          Veículos Ativos
+        </h3>
 
-          <h1>
-            {ativos.length}
-          </h1>
-        </div>
-
-        <div
-          style={{
-            background:
-              "#fff",
-            padding: 20,
-            borderRadius: 10,
-            flex: 1,
-          }}
-        >
-          <h3>
-            Arrecadado
-          </h3>
-
-          <h1>
-            R$
-            {" "}
-            {arrecadado.toFixed(
-              2
-            )}
-          </h1>
-        </div>
+        <h1>
+          {ativos.length}
+        </h1>
       </div>
 
       <form
