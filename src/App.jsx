@@ -65,10 +65,12 @@ function App() {
         .from("movimentacoes")
         .insert([
           {
-            placa,
-            modelo,
-            status: "ativo",
-          },
+  placa,
+  modelo,
+  status: "ativo",
+  entrada_em:
+    new Date(),
+},
         ]);
 
     if (error) {
@@ -119,8 +121,7 @@ function App() {
         .update({
           status:
             "finalizado",
-          saida_em:
-            saida.toISOString(),
+          saida_em: saida,
           valor,
         })
         .eq("id", item.id);
