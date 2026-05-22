@@ -3,13 +3,15 @@ import { useAuth } from "./context/AuthContext";
 import { supabase } from "./lib/supabase";
 
 function formatarData(data) {
-  return new Date(data).toLocaleString(
+  return new Intl.DateTimeFormat(
     "pt-BR",
     {
       timeZone:
         "America/Sao_Paulo",
+      dateStyle: "short",
+      timeStyle: "medium",
     }
-  );
+  ).format(new Date(data));
 }
 
 function App() {
