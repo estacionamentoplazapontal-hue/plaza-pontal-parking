@@ -9,8 +9,17 @@ function formatarData(data) {
 }
 
 function App() {
-  const { user, signOut } =
-    useAuth();
+  const {
+    user,
+    signIn,
+    signOut,
+  } = useAuth();
+
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
 
   const [placa, setPlaca] =
     useState("");
@@ -49,8 +58,24 @@ function App() {
   }
 
   useEffect(() => {
-    carregarMovimentacoes();
-  }, []);
+    if (user) {
+      carregarMovimentacoes();
+    }
+  }, [user]);
+
+  async function handleLogin(e) {
+    e.preventDefault();
+
+    const { error } =
+      await signIn(
+        email,
+        password
+      );
+
+    if (error) {
+      alert(error.message);
+    }
+  }
 
   async function registrarEntrada(
     e
@@ -143,6 +168,82 @@ function App() {
             busca.toLowerCase()
           )
     );
+
+  if (!user) {
+    return (
+      <div
+        style={{
+          minHeight:
+            "100vh",
+          display: "flex",
+          justifyContent:
+            "center",
+          alignItems:
+            "center",
+          background:
+            "#f5f5f5",
+          fontFamily:
+            "Arial",
+        }}
+      >
+        <form
+          onSubmit={
+            handleLogin
+          }
+          style={{
+            background:
+              "#fff",
+            padding: 30,
+            borderRadius: 10,
+            width: 320,
+            display: "flex",
+            flexDirection:
+              "column",
+            gap: 12,
+          }}
+        >
+          <h2>
+            Plaza Pontal
+            Parking
+          </h2>
+
+          <input
+            type="email"
+            placeholder="E-mail"
+            value={email}
+            onChange={(e) =>
+              setEmail(
+                e.target.value
+              )
+            }
+            style={{
+              padding: 12,
+            }}
+          />
+
+          <input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+            style={{
+              padding: 12,
+            }}
+          />
+
+          <button
+            type="submit"
+          >
+            Entrar
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -326,26 +427,6 @@ function App() {
 
                     <br />
 
-                    Permanência:
-                    {" "}
-                    {Math.max(
-                      1,
-                      Math.ceil(
-                        (new Date(
-                          item.saida_em
-                        ).getTime() -
-                          new Date(
-                            item.entrada_em
-                          ).getTime()) /
-                          1000 /
-                          60 /
-                          60
-                      )
-                    )}
-                    h
-
-                    <br />
-
                     Valor:
                     {" "}
                     R$
@@ -369,14 +450,7 @@ function App() {
                   Saída
                 </button>
               ) : (
-                <span
-                  style={{
-                    color:
-                      "green",
-                    fontWeight:
-                      "bold",
-                  }}
-                >
+                <span>
                   Finalizado
                 </span>
               )}
