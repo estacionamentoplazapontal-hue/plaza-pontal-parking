@@ -3,14 +3,10 @@ import { useAuth } from "./context/AuthContext";
 import { supabase } from "./lib/supabase";
 
 function formatarData(data) {
-  return new Intl.DateTimeFormat(
-    "pt-BR",
-    {
-      timeZone:
-        "America/Sao_Paulo",
-      dateStyle: "short",
-      timeStyle: "medium",
-    }
+  return new Date(data).toLocaleString(
+    "pt-BR"
+  );
+}
   ).format(new Date(data));
 }
 
@@ -68,9 +64,7 @@ function App() {
   placa,
   modelo,
   status: "ativo",
-  entrada_em:
-    new Date(),
-},
+}
         ]);
 
     if (error) {
@@ -121,7 +115,8 @@ function App() {
         .update({
           status:
             "finalizado",
-          saida_em: saida,
+          saida_em:
+new Date(),
           valor,
         })
         .eq("id", item.id);
