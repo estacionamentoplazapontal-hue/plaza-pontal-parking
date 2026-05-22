@@ -1,46 +1,74 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
 import { supabase } from "../lib/supabase";
 
-const AuthContext = createContext();
+const AuthContext =
+  createContext({});
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export function AuthProvider({
+  children,
+}) {
+  const [user, setUser] =
+    useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
-    async function getSession() {
+    async function carregarUsuario() {
       const {
         data: { session },
-      } = await supabase.auth.getSession();
+      } =
+        await supabase.auth.getSession();
 
-      setUser(session?.user ?? null);
+      setUser(
+        session?.user || null
+      );
+
       setLoading(false);
     }
 
-    getSession();
+    carregarUsuario();
 
     const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
+      data: listener,
+    } =
+      supabase.auth.onAuthStateChange(
+        (_event, session) => {
+          setUser(
+            session?.user || null
+          );
+        }
+      );
 
     return () => {
-      subscription.unsubscribe();
+      listener.subscription.unsubscribe();
     };
   }, []);
 
-  async function signIn(email, password) {
-    return supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  async function signIn(
+    email,
+    password
+  ) {
+    return await supabase.auth.signInWithPassword(
+      {
+        email,
+        password,
+      }
+    );
   }
 
   async function signOut() {
     await supabase.auth.signOut();
+
+    setUser(null);
+
+    window.location.reload();
   }
 
   return (
@@ -52,11 +80,14 @@ export function AuthProvider({ children }) {
         signOut,
       }}
     >
-      {children}
+      {!loading &&
+        children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  return useContext(AuthContext);
+  return useContext(
+    AuthContext
+  );
 }
