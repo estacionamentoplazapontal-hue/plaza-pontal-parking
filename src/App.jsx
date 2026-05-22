@@ -71,20 +71,39 @@ function App() {
   }
 
   async function registrarSaida(
-    id
-  ) {
-    await supabase
-      .from("movimentacoes")
-      .update({
-        status:
-          "finalizado",
-        saida_em:
-          new Date(),
-      })
-      .eq("id", id);
+  item
+) {
+  const entrada =
+    new Date(
+      item.entrada_em
+    );
 
-    carregarMovimentacoes();
-  }
+  const saida =
+    new Date();
+
+  const horas =
+    Math.ceil(
+      (saida - entrada) /
+        1000 /
+        60 /
+        60
+    );
+
+  const valor =
+    horas * 15;
+
+  await supabase
+    .from("movimentacoes")
+    .update({
+      status:
+        "finalizado",
+      saida_em: saida,
+      valor,
+    })
+    .eq("id", item.id);
+
+  carregarMovimentacoes();
+}
 
   return (
     <div
@@ -211,17 +230,43 @@ function App() {
                 <br />
 
                 Status:
-                {" "}
-                {item.status}
+{" "}
+{item.status}
+
+<br />
+
+Entrada:
+{" "}
+{new Date(
+  item.entrada_em
+).toLocaleString()}
+
+<br />
+
+{item.saida_em && (
+  <>
+    Saída:
+    {" "}
+    {new Date(
+      item.saida_em
+    ).toLocaleString()}
+
+    <br />
+
+    Valor:
+    {" "}
+    R$
+    {" "}
+    {item.valor}
+  </>
+)}
               </div>
 
               {item.status ===
                 "ativo" && (
                 <button
                   onClick={() =>
-                    registrarSaida(
-                      item.id
-                    )
+                    registrarSaida(item)
                   }
                 >
                   Saída
