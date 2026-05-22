@@ -1,53 +1,103 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "./context/AuthContext";
+import { supabase } from "./lib/supabase";
 
 function App() {
   const {
     user,
-    signIn,
     signOut,
   } = useAuth();
 
-  const [email, setEmail] =
+  const [placa, setPlaca] =
     useState("");
 
-  const [password, setPassword] =
+  const [modelo, setModelo] =
     useState("");
 
-  async function handleLogin(e) {
-    e.preventDefault();
+  const [movimentacoes, setMovimentacoes] =
+    useState([]);
 
-    const { error } =
-      await signIn(email, password);
+  async function carregarMovimentacoes() {
+    const { data } =
+      await supabase
+        .from("movimentacoes")
+        .select("*")
+        .order(
+          "entrada_em",
+          { ascending: false }
+        );
 
-    if (error) {
-      alert(error.message);
+    if (data) {
+      setMovimentacoes(data);
     }
   }
 
-  if (user) {
-    return (
+  useEffect(() => {
+    carregarMovimentacoes();
+  }, []);
+
+  async function registrarEntrada(e) {
+    e.preventDefault();
+
+    if (!placa) return;
+
+    await supabase
+      .from("movimentacoes")
+      .insert([
+        {
+          placa,
+          modelo,
+          status: "ativo",
+        },
+      ]);
+
+    setPlaca("");
+    setModelo("");
+
+    carregarMovimentacoes();
+  }
+
+  async function registrarSaida(id) {
+    await supabase
+      .from("movimentacoes")
+      .update({
+        status: "finalizado",
+        saida_em:
+          new Date(),
+      })
+      .eq("id", id);
+
+    carregarMovimentacoes();
+  }
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f5f5f5",
+        padding: 20,
+        fontFamily: "Arial",
+      }}
+    >
       <div
         style={{
-          minHeight: "100vh",
-          background: "#f5f5f5",
-          padding: 40,
-          fontFamily: "Arial",
+          display: "flex",
+          justifyContent:
+            "space-between",
+          alignItems: "center",
         }}
       >
-        <h1>
-          Plaza Pontal Parking
-        </h1>
+        <div>
+          <h1>
+            Plaza Pontal Parking
+          </h1>
 
-        <p>
-          Sistema online
-        </p>
-
-        <p>
-          Usuário:
-          {" "}
-          {user.email}
-        </p>
+          <p>
+            Usuário:
+            {" "}
+            {user?.email}
+          </p>
+        </div>
 
         <button
           onClick={signOut}
@@ -55,70 +105,110 @@ function App() {
           Sair
         </button>
       </div>
-    );
-  }
 
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f5f5f5",
-        fontFamily: "Arial",
-      }}
-    >
       <form
-        onSubmit={handleLogin}
+        onSubmit={
+          registrarEntrada
+        }
         style={{
           background: "#fff",
-          padding: 30,
+          padding: 20,
           borderRadius: 10,
-          width: 320,
+          marginTop: 20,
           display: "flex",
-          flexDirection: "column",
-          gap: 12,
+          gap: 10,
+        }}
+      >
+        <input
+          placeholder="Placa"
+          value={placa}
+          onChange={(e) =>
+            setPlaca(
+              e.target.value
+            )
+          }
+          style={{
+            padding: 12,
+            flex: 1,
+          }}
+        />
+
+        <input
+          placeholder="Modelo"
+          value={modelo}
+          onChange={(e) =>
+            setModelo(
+              e.target.value
+            )
+          }
+          style={{
+            padding: 12,
+            flex: 1,
+          }}
+        />
+
+        <button type="submit">
+          Entrada
+        </button>
+      </form>
+
+      <div
+        style={{
+          marginTop: 20,
+          background: "#fff",
+          borderRadius: 10,
+          padding: 20,
         }}
       >
         <h2>
-          Plaza Pontal Parking
+          Veículos no pátio
         </h2>
 
-        <input
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) =>
-            setEmail(e.target.value)
-          }
-          style={{
-            padding: 12,
-          }}
-        />
+        {movimentacoes.map(
+          (item) => (
+            <div
+              key={item.id}
+              style={{
+                borderBottom:
+                  "1px solid #ddd",
+                padding: 10,
+                display: "flex",
+                justifyContent:
+                  "space-between",
+              }}
+            >
+              <div>
+                <strong>
+                  {item.placa}
+                </strong>
 
-        <input
-          type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          style={{
-            padding: 12,
-          }}
-        />
+                <br />
 
-        <button
-          type="submit"
-          style={{
-            padding: 12,
-            cursor: "pointer",
-          }}
-        >
-          Entrar
-        </button>
-      </form>
+                {item.modelo}
+
+                <br />
+
+                Status:
+                {" "}
+                {item.status}
+              </div>
+
+              {item.status ===
+                "ativo" && (
+                <button
+                  onClick={() =>
+                    registrarSaida(
+                      item.id
+                    )
+                  }
+                >
+                  Saída
+                </button>
+              )}
+            </div>
+          )
+        )}
+      </div>
     </div>
   );
 }
