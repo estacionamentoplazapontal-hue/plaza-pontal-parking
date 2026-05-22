@@ -12,6 +12,7 @@ function App() {
   const {
   user,
   perfil,
+  loading,
   signIn,
   signOut,
 } = useAuth();
@@ -169,6 +170,13 @@ function App() {
             busca.toLowerCase()
           )
     );
+if (loading) {
+  return (
+    <div>
+      Carregando...
+    </div>
+  );
+}
 
   if (!user) {
     return (

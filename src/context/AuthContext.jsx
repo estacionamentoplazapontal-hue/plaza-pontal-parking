@@ -25,18 +25,25 @@ export function AuthProvider({
   async function carregarPerfil(
     userId
   ) {
-    const { data } =
-      await supabase
-        .from("usuarios")
-        .select("*")
-        .eq("id", userId)
-        .single();
+    const {
+      data,
+      error,
+    } = await supabase
+      .from("usuarios")
+      .select("*")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error) {
+      console.log(error);
+      return;
+    }
 
     setPerfil(data);
   }
 
   useEffect(() => {
-    async function init() {
+    async function carregar() {
       const {
         data: { session },
       } =
@@ -56,7 +63,7 @@ export function AuthProvider({
       setLoading(false);
     }
 
-    init();
+    carregar();
 
     const {
       data: listener,
