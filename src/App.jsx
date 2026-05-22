@@ -10,12 +10,12 @@ function formatarData(data) {
 
 function App() {
   const {
-  user,
-  perfil,
-  loading,
-  signIn,
-  signOut,
-} = useAuth();
+    user,
+    perfil,
+    loading,
+    signIn,
+    signOut,
+  } = useAuth();
 
   const [email, setEmail] =
     useState("");
@@ -36,6 +36,26 @@ function App() {
     movimentacoes,
     setMovimentacoes,
   ] = useState([]);
+
+  const [
+    mostrarOperador,
+    setMostrarOperador,
+  ] = useState(false);
+
+  const [
+    operadorNome,
+    setOperadorNome,
+  ] = useState("");
+
+  const [
+    operadorEmail,
+    setOperadorEmail,
+  ] = useState("");
+
+  const [
+    operadorSenha,
+    setOperadorSenha,
+  ] = useState("");
 
   async function carregarMovimentacoes() {
     const {
@@ -77,6 +97,56 @@ function App() {
     if (error) {
       alert(error.message);
     }
+  }
+
+  async function criarOperador(
+    e
+  ) {
+    e.preventDefault();
+
+    const { data, error } =
+      await supabase.auth.signUp({
+        email: operadorEmail,
+        password:
+          operadorSenha,
+      });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    const usuario =
+      data.user;
+
+    if (!usuario) {
+      alert(
+        "Erro ao criar operador"
+      );
+      return;
+    }
+
+    await supabase
+      .from("usuarios")
+      .insert([
+        {
+          id: usuario.id,
+          nome: operadorNome,
+          email:
+            operadorEmail,
+          tipo: "operador",
+        },
+      ]);
+
+    alert(
+      "Operador criado com sucesso"
+    );
+
+    setOperadorNome("");
+    setOperadorEmail("");
+    setOperadorSenha("");
+
+    setMostrarOperador(false);
   }
 
   async function registrarEntrada(
@@ -170,13 +240,10 @@ function App() {
             busca.toLowerCase()
           )
     );
-if (loading) {
-  return (
-    <div>
-      Carregando...
-    </div>
-  );
-}
+
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
 
   if (!user) {
     return (
@@ -244,9 +311,7 @@ if (loading) {
             }}
           />
 
-          <button
-            type="submit"
-          >
+          <button type="submit">
             Entrar
           </button>
         </form>
@@ -280,29 +345,99 @@ if (loading) {
             Parking
           </h1>
 
-         <p>
-  {perfil?.nome}
-</p>
+          <p>
+            {perfil?.nome}
+          </p>
 
-<p>
-  {perfil?.tipo}
-</p>
+          <p>
+            {perfil?.tipo}
+          </p>
         </div>
 
-        <button
-          onClick={signOut}
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+          }}
         >
-          Sair
-        </button>
-{
-  perfil?.tipo ===
-    "admin" && (
-    <button>
-      Criar Operador
-    </button>
-  )
-}
+          {perfil?.tipo ===
+            "admin" && (
+            <button
+              onClick={() =>
+                setMostrarOperador(
+                  !mostrarOperador
+                )
+              }
+            >
+              Criar Operador
+            </button>
+          )}
+
+          <button
+            onClick={signOut}
+          >
+            Sair
+          </button>
+        </div>
       </div>
+
+      {mostrarOperador && (
+        <form
+          onSubmit={
+            criarOperador
+          }
+          style={{
+            background:
+              "#fff",
+            padding: 20,
+            borderRadius: 10,
+            marginTop: 20,
+            display: "flex",
+            gap: 10,
+          }}
+        >
+          <input
+            placeholder="Nome"
+            value={
+              operadorNome
+            }
+            onChange={(e) =>
+              setOperadorNome(
+                e.target.value
+              )
+            }
+          />
+
+          <input
+            placeholder="Email"
+            value={
+              operadorEmail
+            }
+            onChange={(e) =>
+              setOperadorEmail(
+                e.target.value
+              )
+            }
+          />
+
+          <input
+            placeholder="Senha"
+            type="password"
+            value={
+              operadorSenha
+            }
+            onChange={(e) =>
+              setOperadorSenha(
+                e.target.value
+              )
+            }
+          />
+
+          <button type="submit">
+            Salvar
+          </button>
+        </form>
+      )}
 
       <div
         style={{
