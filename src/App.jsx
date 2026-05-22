@@ -7,8 +7,6 @@ function formatarData(data) {
     "pt-BR"
   );
 }
-  ).format(new Date(data));
-}
 
 function App() {
   const { user, signOut } =
@@ -61,10 +59,10 @@ function App() {
         .from("movimentacoes")
         .insert([
           {
-  placa,
-  modelo,
-  status: "ativo",
-}
+            placa,
+            modelo,
+            status: "ativo",
+          },
         ]);
 
     if (error) {
@@ -93,16 +91,14 @@ function App() {
       saida.getTime() -
       entrada.getTime();
 
-    const minutos =
-      Math.ceil(
-        diffMs / 1000 / 60
-      );
-
     const horas =
       Math.max(
         1,
         Math.ceil(
-          minutos / 60
+          diffMs /
+            1000 /
+            60 /
+            60
         )
       );
 
@@ -116,7 +112,7 @@ function App() {
           status:
             "finalizado",
           saida_em:
-new Date(),
+            new Date(),
           valor,
         })
         .eq("id", item.id);
