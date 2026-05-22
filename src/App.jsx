@@ -1,7 +1,15 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import { supabase } from "./lib/supabase";
-
+function formatarData(data) {
+  return new Date(data).toLocaleString(
+    "pt-BR",
+    {
+      timeZone:
+        "America/Sao_Paulo",
+    }
+  );
+}
 function App() {
   const { user, signOut } =
     useAuth();
@@ -74,9 +82,9 @@ function App() {
   item
 ) {
   const entrada =
-    new Date(
-      item.entrada_em
-    );
+    formatarData(
+  item.entrada_em
+));
 
   const saida =
     new Date();
@@ -269,8 +277,9 @@ Entrada:
     Saída:
     {" "}
     {new Date(
-      item.saida_em
-    ).toLocaleString(
+      formatarData(
+  item.saida_em
+).toLocaleString(
   "pt-BR"
 )}
 
