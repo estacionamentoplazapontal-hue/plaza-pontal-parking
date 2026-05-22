@@ -18,6 +18,9 @@ function App() {
   const [modelo, setModelo] =
     useState("");
 
+  const [busca, setBusca] =
+    useState("");
+
   const [
     movimentacoes,
     setMovimentacoes,
@@ -125,6 +128,32 @@ function App() {
     carregarMovimentacoes();
   }
 
+  const ativos =
+    movimentacoes.filter(
+      (m) =>
+        m.status === "ativo"
+    );
+
+  const arrecadado =
+    movimentacoes.reduce(
+      (total, item) =>
+        total +
+        Number(
+          item.valor || 0
+        ),
+      0
+    );
+
+  const filtrados =
+    movimentacoes.filter(
+      (item) =>
+        item.placa
+          ?.toLowerCase()
+          .includes(
+            busca.toLowerCase()
+          )
+    );
+
   return (
     <div
       style={{
@@ -163,6 +192,54 @@ function App() {
         >
           Sair
         </button>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          gap: 20,
+          marginTop: 20,
+        }}
+      >
+        <div
+          style={{
+            background:
+              "#fff",
+            padding: 20,
+            borderRadius: 10,
+            flex: 1,
+          }}
+        >
+          <h3>
+            Veículos Ativos
+          </h3>
+
+          <h1>
+            {ativos.length}
+          </h1>
+        </div>
+
+        <div
+          style={{
+            background:
+              "#fff",
+            padding: 20,
+            borderRadius: 10,
+            flex: 1,
+          }}
+        >
+          <h3>
+            Arrecadado
+          </h3>
+
+          <h1>
+            R$
+            {" "}
+            {arrecadado.toFixed(
+              2
+            )}
+          </h1>
+        </div>
       </div>
 
       <form
@@ -225,7 +302,22 @@ function App() {
           Veículos
         </h2>
 
-        {movimentacoes.map(
+        <input
+          placeholder="Buscar placa"
+          value={busca}
+          onChange={(e) =>
+            setBusca(
+              e.target.value
+            )
+          }
+          style={{
+            padding: 12,
+            width: "100%",
+            marginBottom: 20,
+          }}
+        />
+
+        {filtrados.map(
           (item) => (
             <div
               key={item.id}
