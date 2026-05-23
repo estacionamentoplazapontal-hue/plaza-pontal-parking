@@ -3,9 +3,7 @@ import { useAuth } from "./context/AuthContext";
 import { supabase } from "./lib/supabase";
 
 function formatarData(data) {
-  return new Date(data).toLocaleString(
-    "pt-BR"
-  );
+  return new Date(data).toLocaleString("pt-BR");
 }
 
 function App() {
@@ -213,8 +211,7 @@ function App() {
           }}
         >
           <h2>
-            Plaza Pontal
-            Parking
+            Plaza Pontal Parking
           </h2>
 
           <input
@@ -275,8 +272,7 @@ function App() {
       >
         <div>
           <h1>
-            Plaza Pontal
-            Parking
+            Plaza Pontal Parking
           </h1>
 
           <p>
